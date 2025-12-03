@@ -1,0 +1,17 @@
+Le programme commence par créer un plateau avec neuf case vide.
+
+on def une procédure qui permet d’afficher la grille .
+
+Dans cette procédure le programme parcourt les trois lignes du plateau et affiche trois cases par ligne.
+
+Après chaque ligne sauf après la dernière le programme affiche une ligne pour séparation.
+
+Le programme affiche apres le plateau une première fois pour montrer la grille vide.
+
+Demande ensuite à l’utilisateur dans quelle case il veut placer une croix.
+
+Le programme convertit le numéro choisi par l’utilisateur afin qu’il corresponde au bon emplacement dans le plateau.
+
+Le programme place alors une croix dans la case choisie.
+
+Le programme affich la grille pour montrer la croix mise par l’utilisateur.
