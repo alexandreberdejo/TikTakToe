@@ -7,7 +7,7 @@ def afficher_plateau(board):
     print()
 
 def victoire(board,s):
-    combinaisons=[[0,1,2],[3,4,5][6,7,8],
+    combinaisons=[[0,1,2],[3,4,5],[6,7,8],
                 [0,3,6], [1,4,7], [2,5,8],
                 [0,4,8], [2,4,6]
 ]
@@ -17,4 +17,23 @@ def victoire(board,s):
             return True
         return False
 
+def jeu():
+    board=[" "]*9
+    joueur = "X"
 
+    while True:
+        afficher_plateau(board)
+        choix = int(input("joueur" + joueur + "choisissez(0-8:)"))
+        if board[choix] == " ":
+            board[choix] = joueur
+        else:
+            print("Case occupée")
+            continue
+        if victoire(board, joueur):
+            afficher_plateau(board)
+            print("Le joueur", joueur, "gagne !")
+            break
+
+        joueur = "O" if joueur == "X" else "X"
+
+jeu()
