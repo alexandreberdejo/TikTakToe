@@ -17,21 +17,37 @@ def victoire(board,s):
             return True
         return False
 
+import random
+
+def ia_aleatoire(board):
+    cases_vides = [i for i in range(9) if board[i] == " "]
+    return random.choice(cases_vides)
+
+# Les autres fonctions sont identiques à la version 1
+
 def jeu():
-    board=[" "]*9
+    board = [" "] * 9
     joueur = "X"
 
     while True:
         afficher_plateau(board)
-        choix = int(input("joueur" + joueur + "choisissez(0-8:)"))
+
+        if joueur == "X":
+            choix = int(input("Votre choix (0-8) : "))
+        else:
+            print("L’ordinateur joue…")
+            choix = ia_aleatoire(board)
+            print("IA joue case :", choix)
+
         if board[choix] == " ":
             board[choix] = joueur
         else:
             print("Case occupée")
             continue
+
         if victoire(board, joueur):
             afficher_plateau(board)
-            print("Le joueur", joueur, "gagne !")
+            print(joueur, "gagne !")
             break
 
         joueur = "O" if joueur == "X" else "X"
