@@ -17,6 +17,8 @@ def victoire(board,s):
             return True
         return False
 
+
+
 import random
 
 def ia_aleatoire(board):
@@ -48,6 +50,29 @@ def ia_niveau_2(board, signe):
     # Sinon hasard
     return random.choice([i for i in range(9) if board[i]==" "])
 
+def ia_niveau_3(board, signe):
+    # Centre
+    if board[4] == " ":
+        return 4
+
+    # Coins
+    for c in [0,2,6,8]:
+        if board[c] == " ":
+            return c
+
+    # Bords
+    for b in [1,3,5,7]:
+        if board[b] == " ":
+            return b
+
+niveau = int(input("Choisir niveau IA : 1, 2 ou 3 : "))
+
+if niveau == 1:
+    choix = ia_aleatoire(board)
+elif niveau == 2:
+    choix = ia_niveau_2(board, "O")
+else:
+    choix = ia_niveau_3(board, "O")
 
 def jeu():
     mode = input("1: 2 joueurs | 2: Contre IA : ")
