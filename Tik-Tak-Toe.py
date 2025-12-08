@@ -1,16 +1,15 @@
 import random
 
 
-# IA NIVEAU 1 : Aléatoire
+
+# IA NIVEAU 1 : ALÉATOIRE
 
 def ia_niveau_1(board, signe):
     cases_vides = [i for i in range(9) if board[i] == " "]
     return random.choice(cases_vides)
 
 
-
-# IA NIVEAU 2 : Gagner / Bloquer 
-
+# IA NIVEAU 2 : GAGNER / BLOQUER
 def ia_niveau_2(board, signe):
     adversaire = "O" if signe == "X" else "X"
 
@@ -20,56 +19,77 @@ def ia_niveau_2(board, signe):
         [0,4,8], [2,4,6]
     ]
 
-
-    for combo in combinaisons:
-        a, b, c = combo
-        if board[a] == signe and board[b] == signe and board[c] == " ":
+    # 1) Tenter de gagner
+    for a, b, c in combinaisons:
+        if board[a] == board[b] == signe and board[c] == " ":
             return c
-        if board[a] == signe and board[c] == signe and board[b] == " ":
+        if board[a] == board[c] == signe and board[b] == " ":
             return b
-        if board[b] == signe and board[c] == signe and board[a] == " ":
+        if board[b] == board[c] == signe and board[a] == " ":
             return a
 
     # 2) Bloquer l’adversaire
-    for combo in combinaisons:
-        a, b, c = combo
-        if board[a] == adversaire and board[b] == adversaire and board[c] == " ":
+    for a, b, c in combinaisons:
+        if board[a] == board[b] == adversaire and board[c] == " ":
             return c
-        if board[a] == adversaire and board[c] == adversaire and board[b] == " ":
+        if board[a] == board[c] == adversaire and board[b] == " ":
             return b
-        if board[b] == adversaire and board[c] == adversaire and board[a] == " ":
+        if board[b] == board[c] == adversaire and board[a] == " ":
             return a
 
-    # 3) Jouer au hasard
-    cases_vides = []
-    for i in range(9):
-        if board[i] == " ":
-            cases_vides.append(i)
-
+    # 3) Sinon jouer au hasard
+    cases_vides = [i for i in range(9) if board[i] == " "]
     return random.choice(cases_vides)
 
 
+# IA NIVEAU 3 : ia_minmax (IMBATTABLE)
+def ia_minmax(board, depth, is_maximizing, signe, adversaire):
+    if victoire(board, signe):
+        return 10 - depth
+    if victoire(board, adversaire):
+        return depth - 10
+    if match_nul(board):
+        return 0
 
-# IA NIVEAU 3 : Stratégique
+    if is_maximizing:
+        meilleur_score = -9999
+        for i in range(9):
+            if board[i] == " ":
+                board[i] = signe
+                score = ia_minmax(board, depth+1, False, signe, adversaire)
+                board[i] = " "
+                meilleur_score = max(meilleur_score, score)
+        return meilleur_score
+
+    else:
+        meilleur_score = 9999
+        for i in range(9):
+            if board[i] == " ":
+                board[i] = adversaire
+                score = ia_minmax(board, depth+1, True, signe, adversaire)
+                board[i] = " "
+                meilleur_score = min(meilleur_score, score)
+        return meilleur_score
+
 
 def ia_niveau_3(board, signe):
-    if board[4] == " ":
-        return 4
+    adversaire = "O" if signe == "X" else "X"
+    meilleur_score = -9999
+    meilleur_coup = None
 
-    coins = [i for i in [0, 2, 6, 8] if board[i] == " "]
-    if coins:
-        return random.choice(coins)
+    for i in range(9):
+        if board[i] == " ":
+            board[i] = signe
+            score = ia_minmax(board, 0, False, signe, adversaire)
+            board[i] = " "
+            if score > meilleur_score:
+                meilleur_score = score
+                meilleur_coup = i
 
-    bords = [i for i in [1, 3, 5, 7] if board[i] == " "]
-    if bords:
-        return random.choice(bords)
+    return meilleur_coup
 
-    return ia_niveau_1(board, signe)
+# Fonction de sélection IA
 
-
-# ---------------------------------
-# Choix IA selon niveau
-# ---------------------------------
 def ordinateur(board, signe, niveau):
     if niveau == 1:
         return ia_niveau_1(board, signe)
@@ -80,8 +100,8 @@ def ordinateur(board, signe, niveau):
     return ia_niveau_1(board, signe)
 
 
-# 
-# Affichage du plateau
+
+# AFFICHER LE PLATEAU
 
 def afficher_plateau(board):
     print("\n")
@@ -92,31 +112,24 @@ def afficher_plateau(board):
     print("\n")
 
 
-
-# Vérifier la victoire
-
+# CONDITIONS DE VICTOIRE
 def victoire(board, s):
     combinaisons = [
         [0,1,2], [3,4,5], [6,7,8],
         [0,3,6], [1,4,7], [2,5,8],
         [0,4,8], [2,4,6]
     ]
-    for combo in combinaisons:
-        if board[combo[0]] == board[combo[1]] == board[combo[2]] == s:
+    for a, b, c in combinaisons:
+        if board[a] == board[b] == board[c] == s:
             return True
     return False
 
-
-# 
-# Match nul
 
 def match_nul(board):
     return " " not in board
 
 
-
-# Tour du joueur
-
+# TOUR JOUEUR HUMAIN
 def tour_joueur(board, signe):
     while True:
         try:
@@ -124,33 +137,43 @@ def tour_joueur(board, signe):
             if choix < 0 or choix > 8:
                 print("Veuillez choisir un nombre entre 0 et 8.")
             elif board[choix] != " ":
-                print("Cette case est déjà prise.")
+                print("Case déjà prise.")
             else:
-                board[choix] = signe 
+                board[choix] = signe
                 break
         except:
-            print("Entrée invalide. Essayez encore.")
+            print("Entrée invalide.")
 
 
-# Tour ordinateur
-
+# TOUR ORDINATEUR
 def tour_ordinateur(board, signe, niveau):
-    print(f"L'ordinateur ({signe}) réfléchit (IA niveau {niveau})...")
+    print(f"L’ordinateur ({signe}) réfléchit (niveau {niveau})...")
     choix = ordinateur(board, signe, niveau)
     board[choix] = signe
     print(f"L’ordinateur joue en case {choix}.")
 
 
+# MENU PRINCIPAL
+def menu():
+    print("MENU TIC TAC TOE ")
+    print("1 - Joueur vs Joueur")
+    print("2 - Joueur vs Ordinateur")
+
+    choix = input("Choisissez un mode : ")
+
+    if choix == "1":
+        return "PVP", None     # pas de niveau IA
+    elif choix == "2":
+        niveau = int(input("Choisissez niveau IA : 1 (facile) | 2 (moyen) | 3 (difficile) : "))
+        return "IA", niveau
+    else:
+        print("Choix invalide. Par défaut : Joueur vs Joueur.")
+        return "PVP", None
+
+
 # JEU PRINCIPAL
-
 def jeu():
-    print(" TIC TAC TOE ")
-
-    mode = input("Mode de jeu : (1) 2 joueurs  |  (2) contre l'ordinateur : ")
-
-    niveau_ai = 1
-    if mode == "2":
-        niveau_ai = int(input("Choisissez niveau IA : 1 (facile), 2 (moyen), 3 (difficile) : "))
+    mode, niveau_ai = menu()
 
     board = [" "] * 9
     joueur = "X"
@@ -158,7 +181,7 @@ def jeu():
     while True:
         afficher_plateau(board)
 
-        if mode == "2" and joueur == "O":
+        if mode == "IA" and joueur == "O":  
             tour_ordinateur(board, joueur, niveau_ai)
         else:
             tour_joueur(board, joueur)
@@ -177,4 +200,4 @@ def jeu():
 
 
 # Lancer le jeu
-jeu()
+jeu() 
